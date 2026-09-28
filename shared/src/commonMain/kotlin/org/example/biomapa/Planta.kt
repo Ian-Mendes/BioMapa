@@ -14,6 +14,8 @@ data class Planta(
 
     val nome: String,
     val localizacao: String,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
 
     @SerialName("propriedades_medicas")
     val propriedadesMedicas: String,

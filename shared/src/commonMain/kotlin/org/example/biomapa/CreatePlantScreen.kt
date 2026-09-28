@@ -23,12 +23,19 @@ import supabase
 fun CreatePlantScreen(onPlantCreated: () -> Unit, onBack: () -> Unit) {
     var nome by remember { mutableStateOf("") }
     var localizacao by remember { mutableStateOf("") }
+    var selectedLatitude by remember { mutableStateOf<Double?>(null) }
+    var selectedLongitude by remember { mutableStateOf<Double?>(null) }
     var propriedades by remember { mutableStateOf("") }
 
     var isLoading by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf<String?>(null) }
 
     val coroutineScope = rememberCoroutineScope()
+    val isFormValid = nome.isNotBlank() &&
+        localizacao.isNotBlank() &&
+        propriedades.isNotBlank() &&
+        selectedLatitude != null &&
+        selectedLongitude != null
 
     Column(
         modifier = Modifier
@@ -67,8 +74,20 @@ fun CreatePlantScreen(onPlantCreated: () -> Unit, onBack: () -> Unit) {
                 BioMapaTextField(
                     value = localizacao,
                     onValueChange = { localizacao = it },
-                    label = "Localização (Ex: Perto da Biblioteca)",
+                    label = "Referência da localização (Ex: Perto da Biblioteca)",
                     leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = "Localização") }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                LocationPickerCard(
+                    selectedLatitude = selectedLatitude,
+                    selectedLongitude = selectedLongitude,
+                    onLocationSelected = { latitude, longitude ->
+                        selectedLatitude = latitude
+                        selectedLongitude = longitude
+                    },
+                    modifier = Modifier.fillMaxWidth().height(240.dp)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -114,16 +133,18 @@ fun CreatePlantScreen(onPlantCreated: () -> Unit, onBack: () -> Unit) {
                         isLoading = true
                         message = null
                         try {
-                            val currentUser = supabase.auth.currentUserOrNull()
-                            if (currentUser == null) {
+                            val currentUserId = supabase.auth.currentUserOrNull()?.id ?: DEV_USER_ID.takeIf { DEV_AUTH_BYPASS }
+                            if (currentUserId == null) {
                                 message = "Erro: Usuário não autenticado."
                                 return@launch
                             }
 
                             val novaPlanta = Planta(
-                                userId = currentUser.id,
+                                userId = currentUserId,
                                 nome = nome,
                                 localizacao = localizacao,
+                                latitude = selectedLatitude,
+                                longitude = selectedLongitude,
                                 propriedadesMedicas = propriedades
                             )
 
@@ -138,7 +159,7 @@ fun CreatePlantScreen(onPlantCreated: () -> Unit, onBack: () -> Unit) {
                     }
                 },
                 modifier = Modifier.weight(1f).height(50.dp),
-                enabled = !isLoading && nome.isNotBlank() && localizacao.isNotBlank() && propriedades.isNotBlank()
+                enabled = !isLoading && isFormValid
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)

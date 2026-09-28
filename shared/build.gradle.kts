@@ -12,6 +12,17 @@ plugins {
 
 val datetimeCompat = "0.7.1-0.6.x-compat"
 
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { localProperties.load(it) }
+}
+
+repositories {
+    google()
+    mavenCentral()
+}
+
 kotlin {
     listOf(
         iosArm64(),
@@ -48,8 +59,10 @@ kotlin {
 
     sourceSets {
         androidMain.dependencies {
+            implementation(libs.androidx.activity.compose)
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.compose.uiTooling)
+            implementation("org.osmdroid:osmdroid-android:6.1.20")
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -96,12 +109,6 @@ configurations.all {
 
 buildkonfig {
     packageName = "org.example.biomapa"
-
-    val localProperties = Properties()
-    val localPropertiesFile = rootProject.file("local.properties")
-    if (localPropertiesFile.exists()) {
-        localPropertiesFile.inputStream().use { localProperties.load(it) }
-    }
 
     defaultConfigs {
         buildConfigField(

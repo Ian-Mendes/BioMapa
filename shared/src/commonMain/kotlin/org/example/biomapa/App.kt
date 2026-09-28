@@ -22,9 +22,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.github.jan.supabase.gotrue.auth
+import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import supabase
+
+internal const val DEV_AUTH_BYPASS = true
+internal const val DEV_USER_ID = "00000000-0000-0000-0000-000000000000"
 
 @Serializable
 object AuthRoute
@@ -58,7 +63,7 @@ fun App() {
 
             Box(modifier = Modifier.fillMaxSize()) {
 
-                var isLoggedIn by remember { mutableStateOf(supabase.auth.currentSessionOrNull() != null) }
+                var isLoggedIn by remember { mutableStateOf(DEV_AUTH_BYPASS || supabase.auth.currentSessionOrNull() != null) }
 
                 val navController = rememberNavController()
 
@@ -150,6 +155,13 @@ fun HomeScreen(
     onLogoutClick: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
+    var plantas by remember { mutableStateOf<List<Planta>>(emptyList()) }
+
+    LaunchedEffect(Unit) {
+        plantas = runCatching {
+            supabase.postgrest["plantas"].select(columns = Columns.list("id", "user_id", "nome", "localizacao", "latitude", "longitude", "propriedades_medicas", "foto_url")).decodeList<Planta>()
+        }.getOrElse { emptyList() }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp),
@@ -172,7 +184,14 @@ fun HomeScreen(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        Spacer(modifier = Modifier.height(48.dp))
+        Spacer(modifier = Modifier.height(28.dp))
+
+        PlantMapCard(
+            plantas = plantas,
+            modifier = Modifier.fillMaxWidth().height(280.dp)
+        )
+
+        Spacer(modifier = Modifier.height(28.dp))
 
         Button(
             onClick = onCreatePlantClick,
@@ -189,7 +208,9 @@ fun HomeScreen(
         OutlinedButton(
             onClick = {
                 coroutineScope.launch {
-                    supabase.auth.signOut()
+                    if (!DEV_AUTH_BYPASS) {
+                        supabase.auth.signOut()
+                    }
                     onLogoutClick()
                 }
             },

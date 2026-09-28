@@ -1,0 +1,141 @@
+package org.example.biomapa
+
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.MapTileProviderBasic
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+
+@Composable
+actual fun PlantMapCard(
+    plantas: List<Planta>,
+    modifier: Modifier
+) {
+    val context = LocalContext.current
+    var locationPermissionGranted by remember { mutableStateOf(hasLocationPermission(context)) }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { result ->
+        locationPermissionGranted = result.values.any { it }
+    }
+
+    val center = remember(plantas) { plantas.firstWithCoordinates() ?: CampusCenter }
+    val mapView = remember {
+        Configuration.getInstance().userAgentValue = context.packageName
+        val tileProvider = MapTileProviderBasic(context).apply {
+            setTileSource(TileSourceFactory.MAPNIK)
+        }
+        MapView(context, tileProvider).apply {
+            setMultiTouchControls(true)
+            controller.setZoom(17.0)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        if (!locationPermissionGranted) {
+            permissionLauncher.launch(LocationPermissions)
+        }
+    }
+
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            AndroidView(
+                factory = { mapView },
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(28.dp)),
+                update = { view ->
+                    view.controller.setCenter(GeoPoint(center.latitude, center.longitude))
+                    view.overlays.clear()
+
+                    if (locationPermissionGranted) {
+                        view.overlays.add(
+                            MyLocationNewOverlay(GpsMyLocationProvider(context), view).apply {
+                                enableMyLocation()
+                                enableFollowLocation()
+                                runOnFirstFix {
+                                    view.post {
+                                        myLocation?.let { location ->
+                                            view.controller.setZoom(17.0)
+                                            view.controller.animateTo(location)
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    }
+
+                    plantas.forEach { planta ->
+                        val latitude = planta.latitude ?: return@forEach
+                        val longitude = planta.longitude ?: return@forEach
+                        view.overlays.add(
+                            Marker(view).apply {
+                                position = GeoPoint(latitude, longitude)
+                                title = planta.nome
+                                snippet = planta.localizacao
+                                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                            }
+                        )
+                    }
+                    view.invalidate()
+                }
+            )
+
+            Surface(
+                modifier = Modifier.align(Alignment.TopStart).padding(16.dp),
+                shape = RoundedCornerShape(18.dp),
+                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                tonalElevation = 2.dp
+            ) {
+                Text(
+                    text = if (locationPermissionGranted) "OpenStreetMap | Você está aqui" else "OpenStreetMap",
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+    }
+}
+
+private data class MapPoint(val latitude: Double, val longitude: Double)
+
+private val CampusCenter = MapPoint(latitude = -23.5505, longitude = -46.6333)
+
+private fun List<Planta>.firstWithCoordinates(): MapPoint? {
+    val planta = firstOrNull { it.latitude != null && it.longitude != null } ?: return null
+    return MapPoint(latitude = planta.latitude!!, longitude = planta.longitude!!)
+}
