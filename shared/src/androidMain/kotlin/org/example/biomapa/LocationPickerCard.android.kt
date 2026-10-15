@@ -39,16 +39,17 @@ actual fun LocationPickerCard(
     selectedLatitude: Double?,
     selectedLongitude: Double?,
     onLocationSelected: (latitude: Double, longitude: Double) -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     val context = LocalContext.current
     var locationPermissionGranted by remember { mutableStateOf(hasLocationPermission(context)) }
     var currentLocation by remember { mutableStateOf(lastKnownGeoPoint(context)) }
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) { result ->
-        locationPermissionGranted = result.values.any { it }
-    }
+    val permissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestMultiplePermissions(),
+        ) { result ->
+            locationPermissionGranted = result.values.any { it }
+        }
 
     LaunchedEffect(Unit) {
         if (!locationPermissionGranted) {
@@ -62,51 +63,58 @@ actual fun LocationPickerCard(
         }
     }
 
-    val initialPoint = remember(selectedLatitude, selectedLongitude, currentLocation) {
-        GeoPoint(selectedLatitude ?: currentLocation?.latitude ?: -23.5505, selectedLongitude ?: currentLocation?.longitude ?: -46.6333)
-    }
-    val mapView = remember {
-        Configuration.getInstance().userAgentValue = context.packageName
-        val tileProvider = MapTileProviderBasic(context).apply {
-            setTileSource(TileSourceFactory.MAPNIK)
+    val initialPoint =
+        remember(selectedLatitude, selectedLongitude, currentLocation) {
+            GeoPoint(selectedLatitude ?: currentLocation?.latitude ?: -23.5505, selectedLongitude ?: currentLocation?.longitude ?: -46.6333)
         }
-        MapView(context, tileProvider).apply {
-            setMultiTouchControls(true)
-            controller.setZoom(17.0)
-            controller.setCenter(initialPoint)
+    val mapView =
+        remember {
+            Configuration.getInstance().userAgentValue = context.packageName
+            val tileProvider =
+                MapTileProviderBasic(context).apply {
+                    setTileSource(TileSourceFactory.MAPNIK)
+                }
+            MapView(context, tileProvider).apply {
+                setMultiTouchControls(true)
+                controller.setZoom(17.0)
+                controller.setCenter(initialPoint)
+            }
         }
-    }
 
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             AndroidView(
                 factory = { mapView },
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(24.dp)),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(24.dp)),
                 update = { view ->
-                    val selectedPoint = if (selectedLatitude != null && selectedLongitude != null) {
-                        GeoPoint(selectedLatitude, selectedLongitude)
-                    } else {
-                        initialPoint
-                    }
+                    val selectedPoint =
+                        if (selectedLatitude != null && selectedLongitude != null) {
+                            GeoPoint(selectedLatitude, selectedLongitude)
+                        } else {
+                            initialPoint
+                        }
 
                     view.overlays.clear()
                     view.overlays.add(
-                        MapEventsOverlay(object : MapEventsReceiver {
-                            override fun singleTapConfirmedHelper(point: GeoPoint): Boolean {
-                                onLocationSelected(point.latitude, point.longitude)
-                                view.controller.animateTo(point)
-                                return true
-                            }
+                        MapEventsOverlay(
+                            object : MapEventsReceiver {
+                                override fun singleTapConfirmedHelper(point: GeoPoint): Boolean {
+                                    onLocationSelected(point.latitude, point.longitude)
+                                    view.controller.animateTo(point)
+                                    return true
+                                }
 
-                            override fun longPressHelper(point: GeoPoint): Boolean = false
-                        })
+                                override fun longPressHelper(point: GeoPoint): Boolean = false
+                            },
+                        ),
                     )
 
                     if (locationPermissionGranted) {
@@ -124,7 +132,7 @@ actual fun LocationPickerCard(
                                         }
                                     }
                                 }
-                            }
+                            },
                         )
                     }
 
@@ -134,31 +142,32 @@ actual fun LocationPickerCard(
                                 position = selectedPoint
                                 title = "Localização da planta"
                                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                            }
+                            },
                         )
                     }
 
                     view.controller.setCenter(selectedPoint)
                     view.invalidate()
-                }
+                },
             )
 
             Surface(
                 modifier = Modifier.align(Alignment.BottomCenter).padding(12.dp),
                 shape = RoundedCornerShape(18.dp),
                 color = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
-                tonalElevation = 2.dp
+                tonalElevation = 2.dp,
             ) {
                 Text(
-                    text = if (selectedLatitude != null && selectedLongitude != null) {
-                        "Localização marcada"
-                    } else if (locationPermissionGranted) {
-                        "Toque no mapa para marcar a planta perto de você"
-                    } else {
-                        "Permita a localização e toque no mapa para marcar"
-                    },
+                    text =
+                        if (selectedLatitude != null && selectedLongitude != null) {
+                            "Localização marcada"
+                        } else if (locationPermissionGranted) {
+                            "Toque no mapa para marcar a planta perto de você"
+                        } else {
+                            "Permita a localização e toque no mapa para marcar"
+                        },
                     modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             }
         }

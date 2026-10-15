@@ -24,29 +24,30 @@ actual fun LocationPickerCard(
     selectedLatitude: Double?,
     selectedLongitude: Double?,
     onLocationSelected: (latitude: Double, longitude: Double) -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f))
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)),
     ) {
         Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = "Seleção pelo mapa",
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = if (selectedLatitude != null && selectedLongitude != null) {
-                        "Localização marcada para teste desktop."
-                    } else {
-                        "No Android, toque no mapa Mapbox para marcar a planta."
-                    },
+                    text =
+                        if (selectedLatitude != null && selectedLongitude != null) {
+                            "Localização marcada para teste desktop."
+                        } else {
+                            "No Android, toque no mapa Mapbox para marcar a planta."
+                        },
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Button(onClick = { onLocationSelected(-23.5505, -46.6333) }) {
