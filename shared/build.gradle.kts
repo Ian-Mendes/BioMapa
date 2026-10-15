@@ -8,6 +8,23 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
     id("com.codingfeline.buildkonfig") version "0.22.0"
+    id("org.jlleitschuh.gradle.ktlint")
+    id("io.gitlab.arturbosch.detekt")
+}
+
+ktlint {
+    android.set(true)
+    ignoreFailures.set(false)
+    filter {
+        exclude { it.file.path.contains("/build/") }
+    }
+}
+
+detekt {
+    buildUponDefaultConfig = true
+    allRules = false
+    config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
+    baseline = file("$rootDir/config/detekt/baseline.xml")
 }
 
 val datetimeCompat = "0.7.1-0.6.x-compat"
@@ -26,7 +43,7 @@ repositories {
 kotlin {
     listOf(
         iosArm64(),
-        iosSimulatorArm64()
+        iosSimulatorArm64(),
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "Shared"
@@ -114,12 +131,12 @@ buildkonfig {
         buildConfigField(
             com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
             "SUPABASE_URL",
-            localProperties.getProperty("SUPABASE_URL", "")
+            localProperties.getProperty("SUPABASE_URL", ""),
         )
         buildConfigField(
             com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING,
             "SUPABASE_ANON_KEY",
-            localProperties.getProperty("SUPABASE_ANON_KEY", "")
+            localProperties.getProperty("SUPABASE_ANON_KEY", ""),
         )
     }
 }

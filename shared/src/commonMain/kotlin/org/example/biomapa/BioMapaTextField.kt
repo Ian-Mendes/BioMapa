@@ -21,7 +21,7 @@ fun BioMapaTextField(
     singleLine: Boolean = true,
     minLines: Int = 1,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
-    isError: Boolean = false
+    isError: Boolean = false,
 ) {
     OutlinedTextField(
         value = value,
@@ -34,7 +34,7 @@ fun BioMapaTextField(
         singleLine = singleLine,
         minLines = minLines,
         maxLines = maxLines,
-        isError = isError,                
-        shape = MaterialTheme.shapes.medium
+        isError = isError,
+        shape = MaterialTheme.shapes.medium,
     )
 }

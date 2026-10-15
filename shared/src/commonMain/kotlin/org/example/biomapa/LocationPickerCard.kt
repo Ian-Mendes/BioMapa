@@ -8,5 +8,5 @@ expect fun LocationPickerCard(
     selectedLatitude: Double?,
     selectedLongitude: Double?,
     onLocationSelected: (latitude: Double, longitude: Double) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 )

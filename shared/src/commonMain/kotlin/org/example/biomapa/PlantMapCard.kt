@@ -6,5 +6,5 @@ import androidx.compose.ui.Modifier
 @Composable
 expect fun PlantMapCard(
     plantas: List<Planta>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 )

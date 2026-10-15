@@ -49,38 +49,40 @@ fun AuthScreen(onAuthSuccess: () -> Unit) {
     val emailError = emailText.isNotBlank() && !isEmailValid(emailText)
     val passwordError = passwordText.isNotBlank() && !isPasswordValid(passwordText)
 
-    val isFormValid = if (isLoginMode) {
-        isEmailValid(emailText) && isPasswordValid(passwordText)
-    } else {
-        nomeText.isNotBlank() && sobrenomeText.isNotBlank() && isEmailValid(emailText) && isPasswordValid(passwordText)
-    }
+    val isFormValid =
+        if (isLoginMode) {
+            isEmailValid(emailText) && isPasswordValid(passwordText)
+        } else {
+            nomeText.isNotBlank() && sobrenomeText.isNotBlank() && isEmailValid(emailText) && isPasswordValid(passwordText)
+        }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp)
-            .verticalScroll(rememberScrollState()),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(24.dp)
+                .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         Icon(
             imageVector = Icons.Default.Person,
             contentDescription = "Logo",
             modifier = Modifier.size(64.dp),
-            tint = MaterialTheme.colorScheme.primary
+            tint = MaterialTheme.colorScheme.primary,
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "BioMapa",
             style = MaterialTheme.typography.displaySmall,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.primary,
         )
         Text(
             text = if (isLoginMode) "Que bom ter você de volta!" else "Junte-se à nossa comunidade",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -88,7 +90,7 @@ fun AuthScreen(onAuthSuccess: () -> Unit) {
         Card(
             modifier = Modifier.fillMaxWidth(),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         ) {
             Column(modifier = Modifier.padding(24.dp)) {
                 if (!isLoginMode) {
@@ -96,7 +98,7 @@ fun AuthScreen(onAuthSuccess: () -> Unit) {
                         value = nomeText,
                         onValueChange = { nomeText = it },
                         label = "Nome",
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     )
                     Spacer(modifier = Modifier.height(12.dp))
 
@@ -104,7 +106,7 @@ fun AuthScreen(onAuthSuccess: () -> Unit) {
                         value = sobrenomeText,
                         onValueChange = { sobrenomeText = it },
                         label = "Sobrenome",
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                 }
@@ -115,14 +117,14 @@ fun AuthScreen(onAuthSuccess: () -> Unit) {
                     label = "E-mail acadêmico ou pessoal",
                     leadingIcon = { Icon(Icons.Default.Email, contentDescription = "Email") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    isError = emailError
+                    isError = emailError,
                 )
                 if (emailError) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "Insira um e-mail válido (ex: teste@email.com)",
                         color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall
+                        style = MaterialTheme.typography.bodySmall,
                     )
                 }
 
@@ -135,14 +137,14 @@ fun AuthScreen(onAuthSuccess: () -> Unit) {
                     leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "Senha") },
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    isError = passwordError
+                    isError = passwordError,
                 )
                 if (passwordError) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "A senha deve ter pelo menos 6 caracteres",
                         color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall
+                        style = MaterialTheme.typography.bodySmall,
                     )
                 }
 
@@ -151,7 +153,7 @@ fun AuthScreen(onAuthSuccess: () -> Unit) {
                     Text(
                         text = errorMessage!!,
                         color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall
+                        style = MaterialTheme.typography.bodySmall,
                     )
                 }
 
@@ -172,10 +174,11 @@ fun AuthScreen(onAuthSuccess: () -> Unit) {
                                     supabase.auth.signUpWith(Email) {
                                         email = emailText
                                         password = passwordText
-                                        data = buildJsonObject {
-                                            put("nome", nomeText)
-                                            put("sobrenome", sobrenomeText)
-                                        }
+                                        data =
+                                            buildJsonObject {
+                                                put("nome", nomeText)
+                                                put("sobrenome", sobrenomeText)
+                                            }
                                     }
                                 }
                                 onAuthSuccess()
@@ -186,20 +189,21 @@ fun AuthScreen(onAuthSuccess: () -> Unit) {
                             }
                         }
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    enabled = !isLoading && isFormValid
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                    enabled = !isLoading && isFormValid,
                 ) {
                     if (isLoading) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(24.dp),
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = MaterialTheme.colorScheme.onPrimary,
                         )
                     } else {
                         Text(
                             if (isLoginMode) "Entrar no BioMapa" else "Cadastrar",
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleMedium,
                         )
                     }
                 }

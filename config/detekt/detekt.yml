@@ -1,0 +1,22 @@
+build:
+  maxIssues: 0
+
+complexity:
+  LongMethod:
+    threshold: 80
+  LongParameterList:
+    functionThreshold: 8
+    constructorThreshold: 8
+  TooManyFunctions:
+    thresholdInFiles: 20
+
+style:
+  MagicNumber:
+    ignoreNumbers: ['-1', '0', '1', '2']
+    ignoreAnnotated: ['Composable']
+  UnusedPrivateMember:
+    ignoreAnnotated: ['Preview']
+
+naming:
+  FunctionNaming:
+    ignoreAnnotated: ['Composable']

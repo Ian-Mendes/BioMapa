@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 actual fun PlantMapCard(
     plantas: List<Planta>,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     IosFallbackPlantMapCard(plantas = plantas, modifier = modifier)
 }
@@ -22,13 +22,13 @@ actual fun PlantMapCard(
 @Composable
 private fun IosFallbackPlantMapCard(
     plantas: List<Planta>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Card(modifier = modifier) {
         Column(
             modifier = Modifier.fillMaxSize().padding(16.dp),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text("Mapa Mapbox disponível no Android")
             Text("${plantas.size} plantas cadastradas")

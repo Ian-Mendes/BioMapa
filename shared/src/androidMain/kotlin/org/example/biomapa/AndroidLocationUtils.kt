@@ -6,10 +6,11 @@ import android.content.pm.PackageManager
 import android.location.LocationManager
 import org.osmdroid.util.GeoPoint
 
-internal val LocationPermissions = arrayOf(
-    Manifest.permission.ACCESS_FINE_LOCATION,
-    Manifest.permission.ACCESS_COARSE_LOCATION
-)
+internal val LocationPermissions =
+    arrayOf(
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+    )
 
 internal fun hasLocationPermission(context: Context): Boolean {
     return LocationPermissions.any { permission ->
@@ -22,9 +23,10 @@ internal fun lastKnownGeoPoint(context: Context): GeoPoint? {
 
     val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     val providers = locationManager.getProviders(true)
-    val location = providers
-        .mapNotNull { provider -> runCatching { locationManager.getLastKnownLocation(provider) }.getOrNull() }
-        .maxByOrNull { it.time }
+    val location =
+        providers
+            .mapNotNull { provider -> runCatching { locationManager.getLastKnownLocation(provider) }.getOrNull() }
+            .maxByOrNull { it.time }
 
     return location?.let { GeoPoint(it.latitude, it.longitude) }
 }

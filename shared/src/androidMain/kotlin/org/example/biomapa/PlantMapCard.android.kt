@@ -36,27 +36,30 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 @Composable
 actual fun PlantMapCard(
     plantas: List<Planta>,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     val context = LocalContext.current
     var locationPermissionGranted by remember { mutableStateOf(hasLocationPermission(context)) }
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) { result ->
-        locationPermissionGranted = result.values.any { it }
-    }
+    val permissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestMultiplePermissions(),
+        ) { result ->
+            locationPermissionGranted = result.values.any { it }
+        }
 
     val center = remember(plantas) { plantas.firstWithCoordinates() ?: CampusCenter }
-    val mapView = remember {
-        Configuration.getInstance().userAgentValue = context.packageName
-        val tileProvider = MapTileProviderBasic(context).apply {
-            setTileSource(TileSourceFactory.MAPNIK)
+    val mapView =
+        remember {
+            Configuration.getInstance().userAgentValue = context.packageName
+            val tileProvider =
+                MapTileProviderBasic(context).apply {
+                    setTileSource(TileSourceFactory.MAPNIK)
+                }
+            MapView(context, tileProvider).apply {
+                setMultiTouchControls(true)
+                controller.setZoom(17.0)
+            }
         }
-        MapView(context, tileProvider).apply {
-            setMultiTouchControls(true)
-            controller.setZoom(17.0)
-        }
-    }
 
     LaunchedEffect(Unit) {
         if (!locationPermissionGranted) {
@@ -68,14 +71,15 @@ actual fun PlantMapCard(
         modifier = modifier,
         shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             AndroidView(
                 factory = { mapView },
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(28.dp)),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(28.dp)),
                 update = { view ->
                     view.controller.setCenter(GeoPoint(center.latitude, center.longitude))
                     view.overlays.clear()
@@ -93,7 +97,7 @@ actual fun PlantMapCard(
                                         }
                                     }
                                 }
-                            }
+                            },
                         )
                     }
 
@@ -106,25 +110,25 @@ actual fun PlantMapCard(
                                 title = planta.nome
                                 snippet = planta.localizacao
                                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                            }
+                            },
                         )
                     }
                     view.invalidate()
-                }
+                },
             )
 
             Surface(
                 modifier = Modifier.align(Alignment.TopStart).padding(16.dp),
                 shape = RoundedCornerShape(18.dp),
                 color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
-                tonalElevation = 2.dp
+                tonalElevation = 2.dp,
             ) {
                 Text(
                     text = if (locationPermissionGranted) "OpenStreetMap | Você está aqui" else "OpenStreetMap",
                     modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             }
         }

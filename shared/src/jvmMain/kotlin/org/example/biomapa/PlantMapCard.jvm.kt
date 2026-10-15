@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 actual fun PlantMapCard(
     plantas: List<Planta>,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     FallbackPlantMapCard(plantas = plantas, modifier = modifier)
 }
@@ -39,7 +39,7 @@ actual fun PlantMapCard(
 internal fun FallbackPlantMapCard(
     plantas: List<Planta>,
     modifier: Modifier = Modifier,
-    title: String = "Mapa do campus"
+    title: String = "Mapa do campus",
 ) {
     val primary = MaterialTheme.colorScheme.primary
     val currentLocationColor = MaterialTheme.colorScheme.tertiary
@@ -51,14 +51,15 @@ internal fun FallbackPlantMapCard(
         modifier = modifier,
         shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
     ) {
         Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
             Canvas(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(22.dp))
-                    .background(mapBackground)
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(22.dp))
+                        .background(mapBackground),
             ) {
                 val gridStep = size.width / 5f
                 for (index in 1..4) {
@@ -77,14 +78,14 @@ internal fun FallbackPlantMapCard(
                     start = Offset(size.width * 0.08f, size.height * 0.76f),
                     end = Offset(size.width * 0.92f, size.height * 0.24f),
                     strokeWidth = 18f,
-                    cap = StrokeCap.Round
+                    cap = StrokeCap.Round,
                 )
                 drawLine(
                     color = pathColor,
                     start = Offset(size.width * 0.16f, size.height * 0.2f),
                     end = Offset(size.width * 0.84f, size.height * 0.68f),
                     strokeWidth = 12f,
-                    cap = StrokeCap.Round
+                    cap = StrokeCap.Round,
                 )
 
                 plantas.take(12).forEach { planta ->
@@ -106,19 +107,19 @@ internal fun FallbackPlantMapCard(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
                     text = "${plantas.size} plantas marcadas",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
 
             MapLegend(
                 modifier = Modifier.align(Alignment.BottomStart).padding(16.dp),
                 currentLocationColor = currentLocationColor,
-                plantMarkerColor = plantMarkerColor
+                plantMarkerColor = plantMarkerColor,
             )
         }
     }
@@ -128,18 +129,18 @@ internal fun FallbackPlantMapCard(
 private fun MapLegend(
     currentLocationColor: Color,
     plantMarkerColor: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(18.dp),
         color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
-        tonalElevation = 2.dp
+        tonalElevation = 2.dp,
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             LegendItem(color = currentLocationColor, label = "Você")
             LegendItem(color = plantMarkerColor, label = "Planta")
@@ -148,26 +149,34 @@ private fun MapLegend(
 }
 
 @Composable
-private fun LegendItem(color: Color, label: String) {
+private fun LegendItem(
+    color: Color,
+    label: String,
+) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
-            modifier = Modifier
-                .size(10.dp)
-                .clip(CircleShape)
-                .background(color)
+            modifier =
+                Modifier
+                    .size(10.dp)
+                    .clip(CircleShape)
+                    .background(color),
         )
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
         )
     }
 }
 
-private fun markerOffsetFor(planta: Planta, width: Float, height: Float): Offset {
+private fun markerOffsetFor(
+    planta: Planta,
+    width: Float,
+    height: Float,
+): Offset {
     if (planta.latitude != null && planta.longitude != null) {
         val x = ((planta.longitude + 180.0) / 360.0).coerceIn(0.0, 1.0).toFloat()
         val y = ((90.0 - planta.latitude) / 180.0).coerceIn(0.0, 1.0).toFloat()
