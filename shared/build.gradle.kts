@@ -77,7 +77,7 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
-            implementation(libs.compose.uiToolingPreview)
+            implementation(libs.compose.uiToolingPreview)          // ← androidx (Android)
             implementation(libs.compose.uiTooling)
             implementation("org.osmdroid:osmdroid-android:6.1.20")
         }
@@ -87,8 +87,7 @@ kotlin {
             implementation(libs.compose.material3)
             implementation(libs.compose.ui)
             implementation(libs.compose.components.resources)
-            implementation(libs.compose.uiToolingPreview)
-
+            implementation(compose.components.uiToolingPreview)        // ✅
             // --- CORRIGIDO: lifecycle e navigation alinhados na mesma geração de release ---
             implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.9.3")
             implementation("org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose:2.9.3")
